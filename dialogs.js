@@ -136,15 +136,22 @@
     function settings(nextRound = false) {
       const series = context.getState().active;
       const locked = !nextRound && series.games.length > 0;
-      const preset = draft || { players: series.players, bestOf: series.bestOf };
+      const preset = draft || {
+        players: series.players,
+        teams: nextRound ? ["", ""] : engine.gameTeams(series, 0),
+        bestOf: series.bestOf
+      };
       const labels = ["三场两胜", "五场三胜", "七场四胜"];
       const options = [3, 5, 7].map((n, i) =>
         '<label class="cs-d-option"><input type="radio" name="format" value="' + n + '">' +
         '<span><b>BO' + n + '</b><small>' + labels[i] + '</small></span></label>').join("");
-      const home = nextRound ? 0 : engine.homeSide(series);
-      const names = [0, 1].map(i =>
-        '<label class="cs-d-player"><span><i class="cs-d-dot p' + (i === home ? 1 : 2) + '"></i>玩家 ' + (i + 1) + ' 昵称</span>' +
+      const sides = ["红方", "蓝方"];
+      const names = sides.map((side, i) =>
+        '<label class="cs-d-player"><span><i class="cs-d-dot p' + (i + 1) + '"></i>' + side + '昵称</span>' +
         '<input type="text" name="player' + i + '" autocomplete="off" required></label>').join("");
+      const teams = sides.map((side, i) =>
+        '<label class="cs-d-player"><span>' + side + '首场球队</span>' +
+        '<input type="text" name="team' + i + '" placeholder="选填" autocomplete="off"></label>').join("");
       const resetLink = !nextRound && (series.games.length || series.homeRoll)
         ? '<div class="cs-d-reset-row"><button type="button" class="cs-d-text-btn cs-d-reset">' +
           icon("reset", 16) + '重置本轮比分</button></div>' : "";
@@ -152,12 +159,14 @@
         nextRound ? "开始下一轮" : "系列赛设置",
         nextRound ? "确认双方昵称和赛制后，开始新的系列赛。" :
           (locked ? "修改昵称会同步更新本轮所有场次的显示。" : "填写双方昵称，再选定本轮赛制。"),
-        '<div class="cs-d-players">' + names + '</div><fieldset class="cs-d-fieldset">' +
+        '<div class="cs-d-players">' + names + teams + '</div><fieldset class="cs-d-fieldset">' +
         '<legend>系列赛赛制</legend><div class="cs-d-formats">' + options + '</div>' +
         (locked ? '<p class="cs-d-hint">已有比分，本轮赛制已锁定。</p>' : '') + '</fieldset>' + resetLink,
         cancelButton() + primaryButton(nextRound ? "开始下一轮" : "保存设置"));
-      const nameInputs = [...dialog.querySelectorAll('.cs-d-player input')];
+      const nameInputs = [...dialog.querySelectorAll('input[name^="player"]')];
+      const teamInputs = [...dialog.querySelectorAll('input[name^="team"]')];
       nameInputs.forEach((input, i) => { input.value = preset.players[i]; });
+      teamInputs.forEach((input, i) => { input.value = preset.teams[i]; });
       const radios = [...dialog.querySelectorAll('input[name="format"]')];
       radios.forEach(input => {
         input.checked = Number(input.value) === preset.bestOf;
@@ -165,6 +174,7 @@
       });
       const values = () => ({
         players: nameInputs.map(input => input.value),
+        teams: teamInputs.map(input => input.value),
         bestOf: Number(radios.find(input => input.checked).value)
       });
       const resetControl = $(".cs-d-reset");
@@ -176,8 +186,9 @@
         const chosen = values();
         return context.update(latest => {
           verifyRound(latest, series, nextRound);
-          return nextRound ? engine.next(latest, chosen.players, chosen.bestOf) :
+          const configured = nextRound ? engine.next(latest, chosen.players, chosen.bestOf) :
             engine.configure(latest, chosen.players, chosen.bestOf);
+          return engine.setGameTeams(configured, 0, chosen.teams);
         });
       }, nextRound ? "新一轮系列赛已开始" : "系列赛设置已保存");
       focus(nextRound ? 'input[name="player0"]' : ".cs-d-close");

@@ -70,6 +70,7 @@
         "第 " + (series.games.length + 1) + " 场开始前，双方各掷一颗六面骰。点数大的一方当主场，平局重掷。";
       seats.forEach((node, side) => {
         const role = side === home ? "主场" : "客场";
+        node.dataset.player = side === 0 ? "red" : "blue";
         node.dataset.side = assigned ? (side === home ? "home" : "away") : "";
         node.querySelector(".dice-player").textContent = series.players[side];
         node.querySelector(".dice-value").textContent = dice ?

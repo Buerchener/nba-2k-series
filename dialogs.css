@@ -38,7 +38,7 @@ body:has(.cs-dialog[open]) { overflow: hidden; }
 .cs-d-player > span, .cs-d-fieldset legend { font-size: 13px; color: #d7d7d7; font-weight: 600; }
 .cs-d-player > span { display: flex; gap: 8px; align-items: center; }
 .cs-d-dot { width: 7px; height: 7px; border-radius: 50%; }
-.cs-d-dot.p1 { background: var(--orange, #ff783c); }
+.cs-d-dot.p1 { background: var(--red, #ff786c); }
 .cs-d-dot.p2 { background: var(--blue, #80b2ea); }
 .cs-dialog .cs-d-player input {
   width: 100%; min-width: 0; height: 44px; border-radius: 7px;

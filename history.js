@@ -59,16 +59,18 @@
       heading.scope = "row";
       row.append(heading);
       const home = window.SeriesEngine.gameHomeSide(game);
+      const teams = window.SeriesEngine.gameTeams(series,index);
       game.scores.forEach((score, side) => {
         const cell = row.insertCell();
         cell.textContent = score;
         if (score > game.scores[1 - side]) {
-          cell.className = "archive-game-win side-" + (side === home ? 0 : 1);
+          cell.className = "archive-game-win side-" + side;
           cell.append(element("span", "archive-visually-hidden", "，本场胜"));
         }
         const role = side === home ? "主场" : "客场";
         const draw = game.homeRoll ? " · 骰子 " + game.homeRoll.dice[side] + " 点" : "";
-        cell.append(element("small", "archive-game-role", role + draw));
+        const club = teams[side] ? teams[side] + " · " : "";
+        cell.append(element("small", "archive-game-role", club + role + draw));
       });
     });
     return table;

@@ -47,9 +47,10 @@
   box-shadow: inset 0 1px 2px #0006;
 }
 .dice-value { font-size: 13px; font-weight: 600; color: var(--muted); }
-.dice-seat[data-side="home"] { background: linear-gradient(180deg, transparent, #55332238); }
-.dice-seat[data-side="home"] .dice-value { color: var(--orange); }
-.dice-seat[data-side="away"] .dice-value { color: var(--blue); }
+.dice-seat[data-player="red"] { --dice-side-color: var(--red, #ff786c); }
+.dice-seat[data-player="blue"] { --dice-side-color: var(--blue, #80b2ea); }
+.dice-player, .dice-seat[data-side]:not([data-side=""]) .dice-value { color: var(--dice-side-color); }
+.dice-seat[data-side="home"] { background: linear-gradient(180deg, transparent, #c8ad6c12); }
 .dice-outcome {
   color: var(--ink);
   font-size: 15px;

@@ -3,7 +3,7 @@
   "use strict";
 
   const KEY = "nba2k.series-scorebook.v1";
-  const VERSION = 2;
+  const VERSION = 3;
   const FORMATS = [3, 5, 7];
 
   function isObject(value) {
@@ -44,21 +44,62 @@
     return scores;
   }
 
-  function newSeries(players, bestOf) {
+  function validatedTeams(teams) {
+    if (!Array.isArray(teams) || teams.length !== 2 || !Array.from(teams).every(team => typeof team === "string")) {
+      throw new Error("请按红方、蓝方顺序填写两支球队，未选球队可以留空。");
+    }
+    return teams.map(team => team.trim());
+  }
+
+  function validatedSchedule(schedule, bestOf) {
+    if (schedule === undefined) return {};
+    if (!isObject(schedule)) throw new Error("备份中的球队安排无效。");
+    const result = {};
+    for (const [key, value] of Object.entries(schedule)) {
+      if (!/^[0-6]$/.test(key) || Number(key) >= bestOf) throw new Error("备份中的球队场次超出赛程。");
+      const teams = validatedTeams(value);
+      if (teams.some(Boolean)) result[key] = teams;
+    }
+    return result;
+  }
+
+  function gameTeams(series, gameIndex) {
+    if (!Number.isInteger(gameIndex) || gameIndex < 0 || gameIndex >= series.bestOf) return ["", ""];
+    return series.teamsByGame?.[gameIndex]?.slice() ?? ["", ""];
+  }
+
+  function setGameTeams(state, gameIndex, teams) {
+    const current = state.active;
+    if (!Number.isInteger(gameIndex) || gameIndex < 0 || gameIndex >= current.bestOf ||
+        gameIndex > current.games.length || (gameIndex === current.games.length && stats(current).champion !== null)) {
+      throw new Error("请选择本轮已打的场次或即将开始的一场。");
+    }
+    const pair = validatedTeams(teams);
+    const teamsByGame = {...current.teamsByGame};
+    if (pair.some(Boolean)) teamsByGame[gameIndex] = pair;
+    else delete teamsByGame[gameIndex];
+    return {...state, active:{...current, teamsByGame}};
+  }
+
+  function newSeries(players, bestOf, teamsByGame = {}) {
     const id = globalThis.crypto?.randomUUID?.() ||
       Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
     return {
       id,
       players: playerNames(players),
       bestOf: format(bestOf),
+      teamsByGame,
       games: [],
       homeRoll: null,
       startedAt: new Date().toISOString()
     };
   }
 
-  function create(players = ["玩家 1", "玩家 2"], bestOf = 7) {
-    return { version: VERSION, active: newSeries(players, bestOf), history: [] };
+  function create(players, bestOf = 7) {
+    const active = players === undefined
+      ? newSeries(["jesse", "Buerchener"], bestOf, {0:["火箭", "湖人"]})
+      : newSeries(players, bestOf);
+    return { version: VERSION, active, history: [] };
   }
 
   function gameWinner(scores) {
@@ -79,7 +120,8 @@
     if (current.games.length && value !== current.bestOf) {
       throw new Error("本轮已有比分，重置本轮后可以更改赛制。");
     }
-    return { ...state, active: { ...current, players: playerNames(players), bestOf: value } };
+    const teamsByGame = Object.fromEntries(Object.entries(current.teamsByGame ?? {}).filter(([index]) => Number(index) < value));
+    return { ...state, active: { ...current, players: playerNames(players), bestOf: value, teamsByGame } };
   }
 
   function rollDie() {
@@ -131,7 +173,9 @@
   }
 
   function reset(state) {
-    return { ...state, active: newSeries(state.active.players, state.active.bestOf) };
+    const current = state.active;
+    const opener = gameTeams(current, 0);
+    return { ...state, active: newSeries(current.players, current.bestOf, opener.some(Boolean) ? {0:opener} : {}) };
   }
 
   function completed(state) {
@@ -197,12 +241,13 @@
     });
     if (archived && !wins.includes(target)) throw new Error("历史系列赛缺少决胜场次。");
     if (homeRoll && wins.includes(target)) throw new Error("已结束的系列赛包含多余的待赛掷骰记录。");
-    return { id: value.id, players, bestOf: value.bestOf, games, homeRoll, startedAt };
+    const teamsByGame = validatedSchedule(value.teamsByGame, value.bestOf);
+    return { id: value.id, players, bestOf: value.bestOf, games, homeRoll, startedAt, teamsByGame };
   }
 
   function validateState(value) {
-    // Version 1 has the same player order but no per-game home assignments.
-    if (!isObject(value) || ![1, VERSION].includes(value.version) || !Array.isArray(value.history)) {
+    // Prior formats use the same player order. Missing team selections stay blank.
+    if (!isObject(value) || ![1, 2, VERSION].includes(value.version) || !Array.isArray(value.history)) {
       throw new Error("请选择本计分板导出的受支持版本 JSON 备份。");
     }
     const active = validateSeries(value.active, false);
@@ -231,6 +276,7 @@
   }
 
   globalThis.SeriesEngine = Object.freeze({
-    KEY, create, configure, rollHome, homeSide, gameHomeSide, record, undo, reset, next, completed, stats, encode, decode
+    KEY, create, configure, gameTeams, setGameTeams, rollHome, homeSide, gameHomeSide,
+    record, undo, reset, next, completed, stats, encode, decode
   });
 })();

@@ -45,22 +45,35 @@
       const gameCell = row.insertCell();
       const scoreCell = row.insertCell();
       const resultCell = row.insertCell();
+      const teams = engine.gameTeams(series, n);
+      const home = game ? engine.gameHomeSide(game) : engine.homeSide(series);
       gameCell.append(element("span", "game-num", "G" + pad(n + 1)));
       if (game) {
-        const home = engine.gameHomeSide(game);
         const away = 1 - home;
         const homeWin = game.scores[home] > game.scores[away];
         const winner = homeWin ? home : away;
         const score = element("span", "log-score");
-        score.append(element("span", homeWin ? "higher-home" : "", game.scores[home]), element("b", "", ":"), element("span", homeWin ? "" : "higher-away", game.scores[away]));
+        const winnerClass = winner === 0 ? "higher-red" : "higher-blue";
+        score.append(element("span", homeWin ? winnerClass : "", game.scores[home]), element("b", "", ":"), element("span", homeWin ? "" : winnerClass, game.scores[away]));
         scoreCell.append(score, element("small", "game-home", "主场 · " + series.players[home]));
-        const result = element("span", "result-name " + (homeWin ? "home" : "away"));
+        const result = element("span", "result-name");
+        result.dataset.player = winner === 0 ? "red" : "blue";
         result.append(element("i", "win-dot"), element("span", "", series.players[winner] + " 胜"));
         resultCell.append(result);
       } else {
         scoreCell.append(element("span", "empty-score", "—"));
         const label = ended ? "无需比赛" : next ? "下一场" : n < earliestFinish ? "待开赛" : "如有需要";
         resultCell.append(element("span", "game-status", label));
+      }
+      if (teams.some(Boolean)) {
+        const matchup = element("small", "game-teams");
+        [home, 1 - home].forEach((side, index) => {
+          if (index) matchup.append(" / ");
+          const team = element("span", "", teams[side] || series.players[side]);
+          team.dataset.player = side === 0 ? "red" : "blue";
+          matchup.append(team);
+        });
+        scoreCell.append(matchup);
       }
       rows.append(row);
     }
@@ -72,6 +85,7 @@
     const { wins, target, champion } = engine.stats(series);
     const ended = champion !== null;
     const count = series.games.length;
+    const teams = engine.gameTeams(series, ended ? count - 1 : count);
     const home = engine.homeSide(series);
     const dice = series.homeRoll?.dice;
     const tied = dice && dice[0] === dice[1];
@@ -79,6 +93,7 @@
     badge.className = "status-pill " + (ended ? "finished" : count ? "playing" : "");
     badge.lastElementChild.textContent = ended ? "已完赛" : count ? "进行中" : "待开赛";
     $(".scoreboard").classList.toggle("champion", ended);
+    $(".scoreboard").dataset.homePlayer = home === 0 ? "red" : "blue";
     $("#hero-bo").textContent = "BO" + series.bestOf;
     $("#hero-rule").textContent = "先赢 " + target + " 场夺冠";
     $("#progress-count").textContent = "已赛 " + count + " / " + series.bestOf + " 场";
@@ -90,10 +105,17 @@
     $("#score-form .record-btn").disabled = submitting || Boolean(tied);
     [home, 1 - home].forEach((i, position) => {
       const key = position === 0 ? "home" : "away";
-      $("#" + key + "-role-en").textContent = tied ? "P" + (i + 1) : key.toUpperCase();
+      const color = i === 0 ? "red" : "blue";
+      $(".competitor." + key).dataset.player = color;
+      $(".input-side." + key).dataset.player = color;
+      $("#" + key + "-role-en").textContent = i === 0 ? "红方" : "蓝方";
       $("#" + key + "-role").textContent = tied ? "待定" : position === 0 ? "主场" : "客场";
       $("#name-" + key).textContent = series.players[i];
       $("#input-" + key + "-label").textContent = series.players[i];
+      for (const teamLabel of [$("#team-" + key), $("#input-" + key + "-team")]) {
+        teamLabel.hidden = !teams[i];
+        teamLabel.textContent = teams[i];
+      }
       const win = $("#wins-" + key);
       win.textContent = wins[i];
       win.setAttribute("aria-label", series.players[i] + "，" + wins[i] + " 胜");
