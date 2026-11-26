@@ -42,6 +42,13 @@ h1{font-size:clamp(29px,2.75vw,40px);line-height:1.25;letter-spacing:-.055em;fon
 .titlebar p{font-size:14px;color:var(--muted);margin-top:7px;letter-spacing:.025em}
 .secondary-btn{border:1px solid #434548;background:#202124;padding:9px 14px;min-height:40px}
 .secondary-btn:hover{background:#2a2c2e;border-color:#666}
+.published-game{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 18px;margin:0 0 14px;padding:12px 18px;border-left:3px solid var(--orange);background:var(--panel)}
+.opener-final{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
+.opener-final span{color:#f4a376;font-size:13px;font-weight:650}
+.opener-final strong{font-size:17px;font-variant-numeric:tabular-nums}
+.opener-take{color:var(--muted);font-size:14px;margin-top:3px}
+.opener-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.opener-actions a{display:inline-flex;align-items:center;min-height:44px;color:#ffb38c;text-underline-offset:3px}
 .scoreboard,.panel{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--panel)}
 .scoreboard{border-color:#404146;--left-wash:#492b2c;--right-wash:#273646}
 .scoreboard[data-home-player="blue"]{--left-wash:#273646;--right-wash:#492b2c}

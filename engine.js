@@ -108,7 +108,8 @@
   }
 
   function openerMatchup(series) {
-    return series.bestOf === 7 && samePair(series.players, OPENER.players) &&
+    return series.bestOf === 7 &&
+      series.players.every((name, side) => name.toLowerCase() === OPENER.players[side].toLowerCase()) &&
       samePair(gameTeams(series, 0), OPENER.teams);
   }
 
@@ -121,27 +122,26 @@
     return openerMatchup(series) && openerResult(series.games[0]);
   }
 
-  function publishedGame() {
-    return {scores: [...OPENER.scores], playedAt: OPENER.recordedAt, homeSide: 0,
-      homeRoll: null, reportId: OPENER.reportId};
+  function canApplyPublishedOpener(state) {
+    const series = state.active;
+    return !state.history.length && !series.games.length && openerMatchup(series) &&
+      (!series.homeRoll || rolledSide(series.homeRoll) === 0);
   }
 
-  function publishToFirstSeries(state) {
+  function applyPublishedOpener(state) {
+    if (!canApplyPublishedOpener(state)) throw new Error("这一轮的赛程与已公布的首场比赛不符。");
     const series = state.active;
-    if (state.history.length || !openerMatchup(series)) return state;
-    const first = series.games[0];
-    if (first ? !openerResult(first) : series.homeRoll !== null) return state;
-    // If this game was already entered, keep its timestamp, dice and all later games.
-    const games = [...series.games];
-    games[0] = first ? {...first, reportId: OPENER.reportId} : publishedGame();
-    return {...state, active: {...series, games}};
+    const game = {scores: [...OPENER.scores], playedAt: OPENER.recordedAt, homeSide: 0,
+      homeRoll: series.homeRoll, reportId: OPENER.reportId};
+    return {...state, active: {...series, games: [game], homeRoll: null}};
   }
 
   function create(players, bestOf = 7) {
     if (players !== undefined) return {version: VERSION, active: newSeries(players, bestOf), history: []};
     const active = newSeries(OPENER.players, bestOf, {0:[...OPENER.teams]});
     if (active.bestOf === 7) active.startedAt = OPENER.recordedAt;
-    return publishToFirstSeries({version: VERSION, active, history: []});
+    const state = {version: VERSION, active, history: []};
+    return canApplyPublishedOpener(state) ? applyPublishedOpener(state) : state;
   }
 
   function gameWinner(scores) {
@@ -309,21 +309,39 @@
     return JSON.stringify(validateState(state), null, 2);
   }
 
-  function decode(text, {publishOpener = false} = {}) {
-    let value;
+  function parseFile(text) {
     try {
-      value = JSON.parse(text);
+      return JSON.parse(text);
     } catch {
       throw new Error("文件内容不是有效的 JSON。");
     }
-    const state = validateState(value);
-    // Only a local pre-publication scorebook gets this one-time upgrade. Restoring
-    // a backup or undoing, resetting, and reloading a v4 round keeps that choice.
-    return publishOpener && value.version < VERSION ? publishToFirstSeries(state) : state;
+  }
+
+  function decodeStored(text) {
+    const value = parseFile(text);
+    const original = validateState(value);
+    const series = original.active;
+    const first = series.games[0];
+    // Empty v4 rounds can be deliberate undo/reset/imports. Only explicit recovery
+    // may add a score there. An identical, already recorded result can gain its link.
+    if (value.version < 4 && canApplyPublishedOpener(original)) {
+      return {state: applyPublishedOpener(original), migrated: true};
+    }
+    if (!original.history.length && first && first.reportId !== OPENER.reportId &&
+        openerMatchup(series) && openerResult(first)) {
+      const games = [{...first, reportId: OPENER.reportId}, ...series.games.slice(1)];
+      return {state: {...original, active: {...series, games}}, migrated: true};
+    }
+    return {state: original, migrated: false};
+  }
+
+  function decode(text, {publishOpener = false} = {}) {
+    return publishOpener ? decodeStored(text).state : validateState(parseFile(text));
   }
 
   globalThis.SeriesEngine = Object.freeze({
-    KEY, create, configure, gameTeams, setGameTeams, isPublishedOpener, rollHome, homeSide, gameHomeSide,
-    record, undo, reset, next, completed, stats, encode, decode
+    KEY, create, configure, gameTeams, setGameTeams, isPublishedOpener, canApplyPublishedOpener,
+    applyPublishedOpener, rollHome, homeSide, gameHomeSide, record, undo, reset, next, completed,
+    stats, encode, decode, decodeStored
   });
 })();

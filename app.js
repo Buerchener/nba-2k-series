@@ -91,6 +91,7 @@
     const { wins, target, champion } = engine.stats(series);
     const ended = champion !== null;
     const count = series.games.length;
+    $("#restore-opener").hidden = store.status() === "corrupt" || !engine.canApplyPublishedOpener(state);
     const teams = engine.gameTeams(series, ended ? count - 1 : count);
     const home = engine.homeSide(series);
     const dice = series.homeRoll?.dice;
@@ -174,6 +175,20 @@
   let scoreDraft;
   let submitting = false;
   let showingAward;
+  const restoreOpener = $("#restore-opener");
+  restoreOpener.addEventListener("click", async () => {
+    if (restoreOpener.disabled) return;
+    restoreOpener.disabled = true;
+    try {
+      await store.update(engine.applyPublishedOpener, store.get());
+      toast("已载入首场比分：火箭 99–109 湖人");
+      $("#score-home").focus({preventScroll:true});
+    } catch (error) {
+      toast(error.message);
+    } finally {
+      restoreOpener.disabled = false;
+    }
+  });
   function showAward(series, opener) {
     const dialog = window.CourtAward.open(series, opener);
     if (!dialog) return;

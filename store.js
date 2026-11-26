@@ -31,8 +31,10 @@
     lastDiskText = text;
     unsavedChanges = false;
     try {
-      state = freeze(text === null ? engine.create() : engine.decode(text, {publishOpener:true}));
+      const loaded = text === null ? {state: engine.create(), migrated:false} : engine.decodeStored(text);
+      state = freeze(loaded.state);
       mode = "saved";
+      if (loaded.migrated) persistUpgrade(state, text);
     } catch {
       // Keep the original bytes available to export until a confirmed import.
       state = freeze(engine.create(["玩家 1", "玩家 2"]));
@@ -104,6 +106,27 @@
       // Some file URLs expose Web Locks but deny access to them.
     }
     return action();
+  }
+
+  function persistUpgrade(upgraded, originalText) {
+    // Use the same lock as score entry. A tab may have saved a newer game since
+    // this tab loaded. Keep the in-memory revision stable while persisting it.
+    void serialized(() => {
+      if (state !== upgraded || lastDiskText !== originalText) return;
+      const latest = readDisk();
+      if (latest !== originalText) {
+        loadExternal(latest);
+        return;
+      }
+      const text = engine.encode(upgraded);
+      globalThis.localStorage.setItem(engine.KEY, text);
+      lastDiskText = text;
+    }).catch(() => {
+      if (state !== upgraded) return;
+      mode = "memory";
+      unsavedChanges = true;
+      notify("warning");
+    });
   }
 
   try {

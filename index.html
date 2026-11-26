@@ -7,19 +7,19 @@
   <meta name="description" content="和朋友打一轮 NBA 2K 系列赛。逐场记分，追踪胜场，争夺冠军奖杯。">
   <title>Courtside · NBA 2K 系列赛记分台</title>
   <link rel="icon" href="./assets/courtside.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=5">
+  <link rel="stylesheet" href="./style.css?v=7">
   <link rel="stylesheet" href="./dialogs.css?v=4">
   <link rel="stylesheet" href="./dice.css?v=4">
   <link rel="stylesheet" href="./history.css?v=4">
   <link rel="stylesheet" href="./award.css">
-  <script defer src="./engine.js?v=5"></script>
-  <script defer src="./store.js?v=5"></script>
+  <script defer src="./engine.js?v=7"></script>
+  <script defer src="./store.js?v=7"></script>
   <script defer src="./dialogs.js?v=4"></script>
   <script defer src="./dice.js?v=4"></script>
   <script defer src="./trophy-model.js"></script>
   <script defer src="./award.js"></script>
   <script defer src="./history.js?v=6"></script>
-  <script defer src="./app.js?v=6"></script>
+  <script defer src="./app.js?v=7"></script>
 </head>
 <body>
   <a class="skip" href="#main">跳转到主要内容</a>
@@ -46,6 +46,16 @@
     <div id="storage-warning" class="storage-warning" hidden></div>
 
     <div id="board-view">
+      <aside class="published-game" id="published-game" aria-label="已公布的首场赛果">
+        <div>
+          <p class="opener-final"><span>公开首场赛果</span> <strong>火箭 99–109 湖人</strong></p>
+          <p class="opener-take">湖人快攻拿下 49 分，比火箭多 23 分。</p>
+        </div>
+        <div class="opener-actions">
+          <button type="button" class="secondary-btn" id="restore-opener" hidden>载入首场比分</button>
+          <a id="opener-commentary" href="./reports/game-01/index.html#commentary">AI 解说席</a>
+        </div>
+      </aside>
       <section class="scoreboard" aria-labelledby="matchup-title">
         <div class="arena">
           <div class="arena-pattern" aria-hidden="true"></div>
