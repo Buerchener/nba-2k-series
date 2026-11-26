@@ -69,6 +69,9 @@ h1{font-size:clamp(29px,2.75vw,40px);line-height:1.25;letter-spacing:-.055em;fon
 .win-marks i{width:22px;height:5px;border-radius:1px;background:color-mix(in srgb,var(--side) 17%,#292929);transform:skew(-17deg)}
 .win-marks .won{background:var(--side)}
 .trophy-block{align-self:center;display:flex;align-items:center;flex-direction:column;min-width:0}
+.trophy-showcase{display:grid;justify-items:center;min-width:0;max-width:100%;background:transparent;border:0;border-radius:10px;padding:4px;line-height:inherit}
+.trophy-showcase:hover .trophy-plaque{color:#ffe5a9}
+.trophy-showcase:hover img{filter:drop-shadow(0 2px 9px #d6a34840)}
 .trophy-halo{position:relative;display:grid;place-items:center;width:100%;isolation:isolate}
 .trophy-halo::before{content:"";position:absolute;z-index:-1;width:200px;height:180px;background:radial-gradient(ellipse,#d7a55321,transparent 67%);pointer-events:none}
 .trophy-halo img{width:auto;height:157px;max-width:95%;object-fit:contain;filter:drop-shadow(0 6px 12px #10101190)}
@@ -133,6 +136,17 @@ tr.future .game-num{color:#989a9f}tr.upcoming{background:#ffffff02}
 .winner-card .winner-icon{color:var(--gold);margin:0 auto;display:flex}
 .winner-card strong{font-size:21px;display:block;overflow-wrap:anywhere;margin-top:5px;color:var(--gold)}
 .winner-card p{font-size:14px;color:var(--muted);margin-top:4px}
+.winner-card .award-reopen{background:#e7c584;border-color:#efd5a5;color:#261f12}
+.winner-card .award-reopen:hover{background:#f2d59e}
+.winner-card .record-btn + .record-btn{background:#25272a;color:var(--ink);border-color:var(--line);margin-top:9px}
+#trophy-preview{width:min(740px,calc(100% - 28px));padding:0;max-height:90vh;overflow:auto;border:1px solid #5f523d;border-radius:14px;background:#191a1c;color:var(--ink);box-shadow:0 16px 80px #0007}
+#trophy-preview::backdrop{background:#08090be6}
+#trophy-preview header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px}
+#trophy-preview h2{font-size:19px}
+#trophy-preview form{margin:0}
+#trophy-preview button{font:400 26px/1 var(--body)}
+#trophy-preview img{display:block;width:100%;max-height:64vh;object-fit:contain;background:#0e1013}
+#trophy-preview p{padding:12px 18px 16px;color:#e3cda3;font-size:14px}
 .site-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:20px 0 28px;color:#929498;font-size:12px}
 .save-state{display:inline-flex;align-items:center;gap:7px}.save-state svg{width:15px;height:15px}
 .footer-wordmark{font-size:15px;letter-spacing:.04em;color:#929498}.footer-wordmark i{color:#a66b49;margin:0 3px}

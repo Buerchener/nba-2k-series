@@ -191,6 +191,17 @@
   font-size: 12px;
   font-weight: 400;
 }
+.archive-award {
+  margin: 0 18px 12px;
+  padding: 7px 13px;
+  min-height: 40px;
+  color: #edce93;
+  background: #322a20;
+  border: 1px solid #63523a;
+  border-radius: 6px;
+  font: 600 14px/1.4 var(--body);
+}
+.archive-award:hover { background: #403325; }
 .archive-game-win.side-0 {
   color: var(--orange, #ff783c);
 }

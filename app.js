@@ -99,8 +99,8 @@
       win.setAttribute("aria-label", series.players[i] + "，" + wins[i] + " 胜");
       $("#marks-" + key).replaceChildren(...Array.from({length:target}, (_, index) => element("i", index < wins[i] ? "won" : "")));
     });
-    $("#trophy-label").textContent = ended ? series.players[champion] + " 捧杯" : "冠军奖杯";
-    $("#trophy").alt = ended ? series.players[champion] + " 赢得本轮金色篮球奖杯" : "金色篮球冠军奖杯";
+    $("#trophy-label").textContent = ended ? series.players[champion] + " 捧杯" : "近看奖杯";
+    $("#trophy-preview-button").setAttribute("aria-label", ended ? "查看" + series.players[champion] + "的冠军奖杯" : "近看冠军奖杯");
     $("#game-label").textContent = ended ? "FINAL" : "GAME " + pad(count + 1);
     $("#entry-heading").textContent = ended ? "系列赛冠军" : "录入比分";
     $("#score-form").hidden = ended;
@@ -138,13 +138,33 @@
       if (active) link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
     });
-    if (history) window.renderHistory($("#history-view"), state);
+    if (history) window.renderHistory($("#history-view"), state, showAward);
     else drawBoard(state);
     drawStorage();
   }
 
   let scoreDraft;
   let submitting = false;
+  let showingAward;
+  function showAward(series, opener) {
+    const dialog = window.CourtAward.open(series, opener);
+    if (!dialog) return;
+    showingAward = {series, dialog};
+    dialog.addEventListener("close", () => {
+      if (showingAward?.dialog === dialog) showingAward = null;
+    }, {once:true});
+  }
+  const preview = $("#trophy-preview");
+  $("#trophy-preview-button").addEventListener("click", event => {
+    const series = store.get().active;
+    if (engine.stats(series).champion !== null) {
+      showAward(series, event.currentTarget);
+      return;
+    }
+    $("#trophy-preview-art").src = "./assets/championship.webp";
+    preview.showModal();
+  });
+  $("#award-reopen").addEventListener("click", event => showAward(store.get().active, event.currentTarget));
   const form = $("#score-form");
   const inputs = [$("#score-home"), $("#score-away")];
   function clearError() {
@@ -171,8 +191,11 @@
       const scores = inputs.map(input => input.value.trim());
       const result = await store.update(state => engine.record(state, scores[home], scores[1 - home]), expected);
       const winner = engine.stats(result.active).champion;
-      toast(winner === null ? "已记录第 " + result.active.games.length + " 场比分" : result.active.players[winner] + " 赢得冠军奖杯！");
-      if (winner !== null) $("#winner-card button").focus({ preventScroll:true });
+      if (winner === null) {
+        toast("已记录第 " + result.active.games.length + " 场比分");
+      } else {
+        showAward(result.active, $("#award-reopen"));
+      }
     } catch (error) {
       $("#score-error").textContent = error.message;
       $("#score-error").hidden = false;
@@ -221,6 +244,10 @@
   });
   store.subscribe(reason => {
     if (reason === "warning") { drawStorage(); return; }
+    if (showingAward) {
+      const current = engine.completed(store.get()).find(series => series.id === showingAward.series.id);
+      if (JSON.stringify(current) !== JSON.stringify(showingAward.series)) showingAward.dialog.close();
+    }
     clearDraft();
     render();
     if (reason === "external") toast("已载入其他标签页的最新记录");

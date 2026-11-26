@@ -74,7 +74,7 @@
     return table;
   }
 
-  function seriesEntry(series, number) {
+  function seriesEntry(series, number, openAward) {
     const { wins, champion } = window.SeriesEngine.stats(series);
     const details = element("details", "archive-entry");
     const summary = element("summary", "archive-summary");
@@ -99,18 +99,23 @@
     const chevron = element("span", "archive-chevron");
     chevron.setAttribute("aria-hidden", "true");
     summary.append(mark, description, tally, chevron);
-    details.append(summary, boxScore(series));
+    const award = element("button", "archive-award", "查看冠军奖杯");
+    award.type = "button";
+    award.setAttribute("aria-haspopup", "dialog");
+    award.setAttribute("aria-label", "查看" + series.players[champion] + "的冠军奖杯");
+    award.addEventListener("click", () => openAward(series, award));
+    details.append(summary, award, boxScore(series));
     return details;
   }
 
-  window.renderHistory = function renderHistory(container, state) {
+  window.renderHistory = function renderHistory(container, state, openAward) {
     const finished = window.SeriesEngine.completed(state);
     if (!finished.length) {
       container.replaceChildren(emptyState());
       return;
     }
     const list = element("div", "archive-list");
-    finished.forEach((series, index) => list.append(seriesEntry(series, finished.length - index)));
+    finished.forEach((series, index) => list.append(seriesEntry(series, finished.length - index, openAward)));
     container.replaceChildren(list);
   };
 })();
