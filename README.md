@@ -4,7 +4,7 @@
 
 用手机或电脑记下每场 NBA 2K 的最终比分，看看谁能拿下这轮系列赛的冠军奖杯。
 
-首场已经完赛。Buerchener 的湖人客场 109–99 战胜 jesse 的火箭，系列赛 1–0 领先。战报收录了球队对比、球员数据和投篮分布。[打开首场战报](https://buerchener.github.io/nba-2k-series/reports/game-01/)
+首场已经完赛。Buerchener 的湖人客场 109–99 战胜 jesse 的火箭，系列赛 1–0 领先。战报收录了球队对比、球员数据和投篮分布。「AI 解说席」根据本场技术统计点评比赛，并给出第二场建议。支持语音朗读的浏览器还可以点「听解说」。[打开首场战报](https://buerchener.github.io/nba-2k-series/reports/game-01/)
 
 ## 怎么打
 

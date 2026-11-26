@@ -61,9 +61,9 @@
         result.append(element("i", "win-dot"), element("span", "", series.players[winner] + " 胜"));
         resultCell.append(result);
         if (engine.isPublishedOpener(series, n)) {
-          const report = element("a", "game-report-link", "技术统计");
+          const report = element("a", "game-report-link", "战报与点评");
           report.href = "./reports/game-01/index.html";
-          report.setAttribute("aria-label", "查看 G01 火箭对湖人的技术统计");
+          report.setAttribute("aria-label", "查看 G01 火箭对湖人的技术统计和 AI 点评");
           gameCell.append(report);
         }
       } else {

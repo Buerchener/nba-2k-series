@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111214">
   <title>首场战报 · 火箭 99–109 湖人 | Courtside</title>
-  <meta name="description" content="NBA 2K 系列赛首场战报。Buerchener 的湖人客场 109–99 战胜 jesse 的火箭，系列赛 1–0 领先。查看球员数据、球队对比和全场投篮图。">
+  <meta name="description" content="NBA 2K 系列赛首场战报。Buerchener 的湖人客场 109–99 战胜 jesse 的火箭。AI 解说席复盘这次逆转，并为双方支招第二场。">
   <link rel="icon" href="../../assets/courtside.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../../style.css?v=5">
-  <link rel="stylesheet" href="./report.css">
+  <link rel="stylesheet" href="./report.css?v=2">
   <script defer src="./data.js"></script>
-  <script defer src="./report.js"></script>
+  <script defer src="./report.js?v=2"></script>
 </head>
 <body class="report">
   <a class="skip" href="#report-main">跳转到战报</a>
@@ -40,8 +40,30 @@
     </div>
     <p class="game-story">东契奇拿下 <strong>44 分、15 篮板、9 助攻</strong>，凯斯勒抢下 <strong>21 个篮板</strong>。杜兰特为火箭攻下全场最高的 <strong>57 分</strong>，另有 8 篮板、1 助攻。</p>
     <nav class="section-links" aria-label="战报章节">
+      <a href="#commentary">AI 解说席</a>
       <a href="#boxscore">球员数据</a><a href="#teams">球队对比</a><a href="#shots">投篮分布</a><a href="#originals">原始截图</a>
     </nav>
+    <section class="report-section commentary" id="commentary" aria-labelledby="commentary-heading">
+      <div class="commentary-header">
+        <h2 id="commentary-heading">AI 解说席</h2>
+        <button id="listen-commentary" type="button" hidden>听解说</button>
+      </div>
+      <div id="commentary-script">
+        <p class="commentary-lead">杜兰特砍了 57 分，火箭最多还领先 18 分。湖人怎么把这场抢回来的？</p>
+        <p>看快攻。Buerchener 的湖人靠快攻拿了 <strong>49 分</strong>，jesse 的火箭拿了 <strong>26 分</strong>。光这一项就差了 23 分，比终场的 10 分分差还大。东契奇离三双只差一次助攻，凯斯勒一个人抢了 21 个篮板。对火箭来说，球一出手，防守就得开始了。</p>
+        <div class="next-game-notes">
+          <div class="rockets">
+            <h3>第二场给 jesse 的建议</h3>
+            <p>杜兰特和阿门·汤普森合拿 89 分，其余队友一共 10 分。可以让阿门为杜兰特掩护后顺下，两人多一个配合选择。出手时留一名后卫先退，优先堵湖人的快攻。</p>
+          </div>
+          <div class="lakers">
+            <h3>第二场给 Buerchener 的建议</h3>
+            <p>让东契奇在凯斯勒拿下后场篮板时接第一传。火箭回防慢就推快攻，退得快就找另一侧的里夫斯。他这场拿了 23 分，值得再给他几个回合。</p>
+          </div>
+        </div>
+      </div>
+      <p class="report-note" id="commentary-audio-status" role="status"></p>
+    </section>
     <section class="report-section" id="boxscore" aria-labelledby="players-heading">
       <h2 id="players-heading">球员数据</h2>
       <div id="box-tables"></div>

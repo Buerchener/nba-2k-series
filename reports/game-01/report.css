@@ -29,6 +29,25 @@
 .report-section { min-width:0; scroll-margin-top:14px; margin:0 0 25px; }
 .report-section h2 { display:flex; gap:9px; align-items:center; font-size:clamp(20px,2vw,25px); letter-spacing:-.04em; margin-bottom:12px; }
 .report-section h2::before { content:""; width:4px; height:.8em; border-radius:1px; background:var(--orange); transform:skew(-12deg); }
+.commentary {
+  padding:clamp(16px,2.4vw,28px);
+  background:linear-gradient(125deg,#28221e,var(--panel) 57%);
+  border:1px solid #4e4034;
+  border-radius:12px;
+}
+.commentary-header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.commentary-header h2 { margin:0; }
+#listen-commentary {
+  min-height:44px; padding:0 14px; border:1px solid #806045; border-radius:8px;
+  background:transparent; color:#ffd4aa; font-weight:650; font-size:.9rem;
+}
+#listen-commentary:hover { background:#352b22; }
+#commentary-script { font-size:1rem; line-height:1.8; color:#d6d6d7; }
+#commentary-script > p { max-width:46em; }
+.commentary-lead { margin:12px 0 8px; color:var(--ink); font-size:clamp(1.13rem,2vw,1.45rem); font-weight:700; line-height:1.55; }
+.next-game-notes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px 28px; border-top:1px solid var(--line); margin-top:18px; padding-top:16px; }
+.next-game-notes h3 { color:var(--club); font-size:1rem; margin-bottom:4px; }
+#commentary-audio-status:empty { display:none; }
 .team-box,.table-card,.shot-card { background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
 .team-box + .team-box { margin-top:12px; }
 .team-box summary { display:flex; align-items:center; gap:10px; cursor:pointer; padding:12px 15px; font-weight:700; background:#222427; color:#f5f4f0; list-style:none; }
@@ -63,6 +82,8 @@
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 .report-footer { padding:18px 0 32px; border-top:1px solid var(--line); }
 @media(max-width:760px) {
+  .next-game-notes { grid-template-columns:1fr; }
+  .section-links { gap:0 14px; }
   .analytics-layout { display:block; }
   .report-header { height:55px; }
   .game-kicker { margin-top:22px; }

@@ -48,4 +48,44 @@
     const row = body.insertRow();
     row.append(cell("th", stat.label, "row"), cell("td", stat.rockets), cell("td", stat.lakers));
   }
+
+  const synth = window.speechSynthesis;
+  if (!synth || !window.SpeechSynthesisUtterance) return;
+  const listen = document.getElementById("listen-commentary");
+  const status = document.getElementById("commentary-audio-status");
+  const passages = Array.from(document.querySelectorAll("#commentary-script p, #commentary-script h3"),
+    node => node.textContent.trim());
+  let speaking = null;
+  function finish(message = "") {
+    speaking = null;
+    listen.textContent = "听解说";
+    status.textContent = message;
+  }
+  function stop() {
+    if (!speaking) return;
+    finish();
+    synth.cancel();
+  }
+  listen.hidden = false;
+  listen.addEventListener("click", () => {
+    if (speaking) { stop(); return; }
+    const voices = synth.getVoices();
+    const voice = voices.find(v => /^zh[-_]CN/i.test(v.lang)) || voices.find(v => /^zh\b/i.test(v.lang));
+    listen.textContent = "停止解说";
+    status.textContent = "";
+    function read(index) {
+      if (index === passages.length) { finish(); return; }
+      const line = new SpeechSynthesisUtterance(passages[index]);
+      line.lang = voice?.lang || "zh-CN";
+      if (voice) line.voice = voice;
+      speaking = line;
+      line.onend = () => { if (speaking === line) read(index + 1); };
+      line.onerror = () => {
+        if (speaking === line) finish("当前设备未能播放中文语音，可直接阅读上方点评。");
+      };
+      synth.speak(line);
+    }
+    read(0);
+  });
+  window.addEventListener("pagehide", stop);
 })();
