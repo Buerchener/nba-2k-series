@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111214">
+  <title>首场战报 · 火箭 99–109 湖人 | Courtside</title>
+  <meta name="description" content="NBA 2K 系列赛首场战报。Buerchener 的湖人客场 109–99 战胜 jesse 的火箭，系列赛 1–0 领先。查看球员数据、球队对比和全场投篮图。">
+  <link rel="icon" href="../../assets/courtside.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../style.css?v=5">
+  <link rel="stylesheet" href="./report.css">
+  <script defer src="./data.js"></script>
+  <script defer src="./report.js"></script>
+</head>
+<body class="report">
+  <a class="skip" href="#report-main">跳转到战报</a>
+  <header class="site-header">
+    <div class="report-header wrap">
+      <a class="brand" href="../../index.html#board" aria-label="Courtside 记分台">
+        <img src="../../assets/courtside.svg" alt="" width="35" height="35">
+        <span>COURTSIDE</span>
+      </a>
+      <a class="back-link" href="../../index.html#board"><span aria-hidden="true">‹</span> 返回记分台</a>
+    </div>
+  </header>
+  <main id="report-main" class="wrap">
+    <p class="game-kicker">BO7 <span>/</span> 第 1 场 <span>/</span> 全场战报</p>
+    <h1>湖人客场赢下首战</h1>
+    <div class="final-score" aria-label="全场比分，主队火箭 99 分，客队湖人 109 分">
+      <div class="club rockets">
+        <span class="club-side">红方 · 主场</span>
+        <strong>火箭</strong><span class="coach">jesse</span>
+      </div>
+      <div class="numerals" aria-hidden="true"><b>99</b><i>–</i><b>109</b></div>
+      <div class="club lakers">
+        <span class="club-side">蓝方 · 客场</span>
+        <strong>湖人</strong><span class="coach">Buerchener</span>
+      </div>
+      <p class="series-line">系列赛 <b>Buerchener 1–0 领先</b></p>
+    </div>
+    <p class="game-story">东契奇拿下 <strong>44 分、15 篮板、9 助攻</strong>，凯斯勒抢下 <strong>21 个篮板</strong>。杜兰特为火箭攻下全场最高的 <strong>57 分</strong>，另有 8 篮板、1 助攻。</p>
+    <nav class="section-links" aria-label="战报章节">
+      <a href="#boxscore">球员数据</a><a href="#teams">球队对比</a><a href="#shots">投篮分布</a><a href="#originals">原始截图</a>
+    </nav>
+    <section class="report-section" id="boxscore" aria-labelledby="players-heading">
+      <h2 id="players-heading">球员数据</h2>
+      <div id="box-tables"></div>
+      <p class="report-note">投篮和三分均为命中数／出手数。杜兰特和东契奇的三分出手数用球队总出手减去其余球员的出手数核对。手机上可横向滑动表格。</p>
+    </section>
+    <div class="analytics-layout">
+      <section class="report-section" id="teams" aria-labelledby="teams-heading">
+        <h2 id="teams-heading">球队对比</h2>
+        <div class="table-card">
+          <table class="compare-table">
+            <caption class="sr-only">全场技术统计，依次为火箭和湖人</caption>
+            <thead><tr><th scope="col">项目</th><th scope="col" class="red-text">火箭</th><th scope="col" class="blue-text">湖人</th></tr></thead>
+            <tbody id="team-stats"></tbody>
+          </table>
+        </div>
+      </section>
+      <div>
+        <section class="report-section" id="shots" aria-labelledby="shot-heading">
+          <h2 id="shot-heading">投篮分布</h2>
+          <figure class="shot-card">
+            <a href="./shot-chart-full.webp" aria-label="打开完整比赛投篮图">
+              <img class="shot-image" src="./shot-chart.webp" alt="全场投篮点位，湖人在左半场，火箭在右半场。红圈代表命中，蓝叉代表未中。" loading="lazy">
+            </a>
+            <figcaption><span>湖人（左）／火箭（右）</span><span><b class="made" aria-hidden="true">○</b> 命中　<b class="miss" aria-hidden="true">×</b> 未中</span></figcaption>
+          </figure>
+          <p class="report-note">投篮图显示火箭 47 篮板、湖人 61 篮板。球队对比页的进攻与防守篮板相加分别为 49 和 62，两处均保留游戏页面的原值。</p>
+        </section>
+        <section class="report-section" id="originals" aria-labelledby="sources-heading">
+          <h2 id="sources-heading">原始截图</h2>
+          <div class="source-grid">
+            <a href="./rockets-1.webp"><img src="./rockets-1.webp" alt="" loading="lazy"><span>火箭球员数据 · 上</span></a>
+            <a href="./rockets-2.webp"><img src="./rockets-2.webp" alt="" loading="lazy"><span>火箭球员数据 · 下</span></a>
+            <a href="./lakers-1.webp"><img src="./lakers-1.webp" alt="" loading="lazy"><span>湖人球员数据 · 上</span></a>
+            <a href="./lakers-2.webp"><img src="./lakers-2.webp" alt="" loading="lazy"><span>湖人球员数据 · 下</span></a>
+            <a href="./team-comparison.webp"><img src="./team-comparison.webp" alt="" loading="lazy"><span>球队对比</span></a>
+            <a href="./shot-chart-full.webp"><img src="./shot-chart-full.webp" alt="" loading="lazy"><span>完整投篮图</span></a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer class="wrap report-footer"><a href="../../index.html#board">返回系列赛记分台</a></footer>
+</body>
+</html>

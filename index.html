@@ -7,19 +7,19 @@
   <meta name="description" content="和朋友打一轮 NBA 2K 系列赛。逐场记分，追踪胜场，争夺冠军奖杯。">
   <title>Courtside · NBA 2K 系列赛记分台</title>
   <link rel="icon" href="./assets/courtside.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=4">
+  <link rel="stylesheet" href="./style.css?v=5">
   <link rel="stylesheet" href="./dialogs.css?v=4">
   <link rel="stylesheet" href="./dice.css?v=4">
   <link rel="stylesheet" href="./history.css?v=4">
   <link rel="stylesheet" href="./award.css">
-  <script defer src="./engine.js?v=4"></script>
-  <script defer src="./store.js"></script>
+  <script defer src="./engine.js?v=5"></script>
+  <script defer src="./store.js?v=5"></script>
   <script defer src="./dialogs.js?v=4"></script>
   <script defer src="./dice.js?v=4"></script>
   <script defer src="./trophy-model.js"></script>
   <script defer src="./award.js"></script>
-  <script defer src="./history.js?v=4"></script>
-  <script defer src="./app.js?v=4"></script>
+  <script defer src="./history.js?v=5"></script>
+  <script defer src="./app.js?v=5"></script>
 </head>
 <body>
   <a class="skip" href="#main">跳转到主要内容</a>
@@ -32,6 +32,7 @@
       <nav aria-label="主要导航">
         <a class="nav-link active" data-view="board" href="#board" aria-current="page"><span data-icon="court"></span>记分台</a>
         <a class="nav-link" data-view="history" href="#history"><span data-icon="history"></span>系列赛历史</a>
+        <a class="nav-link" href="./reports/game-01/index.html"><span data-icon="list"></span>首场战报</a>
       </nav>
       <button class="header-data" type="button" data-open="data"><span data-icon="database"></span>数据管理</button>
     </div>
@@ -58,14 +59,14 @@
           </svg>
           <div class="hero-top">
             <h2 id="matchup-title"><i></i>系列赛大比分</h2>
-            <span class="status-pill" id="series-status"><i></i><span>待开赛</span></span>
+            <span class="status-pill playing" id="series-status"><i></i><span>进行中</span></span>
           </div>
           <div class="matchup">
             <div class="competitor home" data-player="red">
               <span class="side-tag"><i></i><span id="home-role-en">红方</span><b>/</b><span id="home-role">主场</span></span>
               <h3 id="name-home">jesse</h3>
-              <span class="club-name" id="team-home">火箭</span>
-              <div class="win-count" id="wins-home" aria-label="主场 0 胜">0</div>
+              <span class="club-name" id="team-home" hidden></span>
+              <div class="win-count" id="wins-home" aria-label="jesse，0 胜">0</div>
               <div class="win-marks" id="marks-home" aria-hidden="true"></div>
             </div>
             <div class="trophy-block">
@@ -77,27 +78,27 @@
             <div class="competitor away" data-player="blue">
               <span class="side-tag"><i></i><span id="away-role-en">蓝方</span><b>/</b><span id="away-role">客场</span></span>
               <h3 id="name-away">Buerchener</h3>
-              <span class="club-name" id="team-away">湖人</span>
-              <div class="win-count" id="wins-away" aria-label="客场 0 胜">0</div>
+              <span class="club-name" id="team-away" hidden></span>
+              <div class="win-count" id="wins-away" aria-label="Buerchener，1 胜">1</div>
               <div class="win-marks" id="marks-away" aria-hidden="true"></div>
             </div>
           </div>
         </div>
         <div class="hero-foot">
           <div><span class="format" id="hero-bo">BO7</span><span id="hero-rule">先赢 4 场夺冠</span></div>
-          <span class="progress-count" id="progress-count">已赛 0 / 7 场</span>
+          <span class="progress-count" id="progress-count">已赛 1 / 7 场</span>
           <button class="home-dice-button" id="home-dice" type="button" aria-haspopup="dialog"><span data-icon="die"></span><span id="home-dice-label">掷骰定主场</span></button>
         </div>
       </section>
 
       <div class="score-panels">
         <section class="panel entry-panel" aria-labelledby="entry-heading">
-          <div class="panel-heading"><div class="panel-heading-label"><span class="icon-box orange-icon" data-icon="pen"></span><h2 id="entry-heading">录入比分</h2></div><span class="game-label" id="game-label">GAME 01</span></div>
+          <div class="panel-heading"><div class="panel-heading-label"><span class="icon-box orange-icon" data-icon="pen"></span><h2 id="entry-heading">录入比分</h2></div><span class="game-label" id="game-label">GAME 02</span></div>
           <form id="score-form" novalidate>
             <div class="score-inputs">
-              <label class="input-side home" data-player="red"><span class="input-name"><i></i><span id="input-home-label">jesse</span><small class="entry-team" id="input-home-team">火箭</small></span><input id="score-home" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="0" required></label>
+              <label class="input-side home" data-player="red"><span class="input-name"><i></i><span id="input-home-label">jesse</span><small class="entry-team" id="input-home-team" hidden></small></span><input id="score-home" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="0" required></label>
               <span class="input-colon" aria-hidden="true">:</span>
-              <label class="input-side away" data-player="blue"><span class="input-name"><i></i><span id="input-away-label">Buerchener</span><small class="entry-team" id="input-away-team">湖人</small></span><input id="score-away" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="0" required></label>
+              <label class="input-side away" data-player="blue"><span class="input-name"><i></i><span id="input-away-label">Buerchener</span><small class="entry-team" id="input-away-team" hidden></small></span><input id="score-away" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="0" required></label>
             </div>
             <p id="score-error" class="form-error" role="alert" hidden></p>
             <button class="record-btn" type="submit"><span data-icon="plus-circle"></span><span id="record-label">记录本场比分</span></button>

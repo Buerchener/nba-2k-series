@@ -64,6 +64,8 @@ h1{font-size:clamp(29px,2.75vw,40px);line-height:1.25;letter-spacing:-.055em;fon
 .entry-team{color:var(--side);font-size:12px;font-weight:600}
 .game-teams{display:block;margin-top:2px;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
 .game-teams [data-player]{color:var(--side)}
+.game-report-link{display:block;width:fit-content;color:#ffac83;font-size:13px;font-weight:550;line-height:1.6;text-underline-offset:3px}
+.game-report-link:hover{color:#ffccb2}
 .competitor{min-width:0;display:flex;align-items:center;flex-direction:column}
 .side-tag{display:flex;align-items:center;gap:6px;color:var(--side);font-size:12px;font-weight:650;letter-spacing:.045em;line-height:1.3}
 .side-tag i{width:13px;height:3px;transform:skew(-25deg);background:var(--side)}

@@ -3,8 +3,16 @@
   "use strict";
 
   const KEY = "nba2k.series-scorebook.v1";
-  const VERSION = 3;
+  const VERSION = 4;
   const FORMATS = [3, 5, 7];
+  const OPENER = Object.freeze({
+    reportId: "2026-11-26-g01",
+    players: ["jesse", "Buerchener"],
+    teams: ["火箭", "湖人"],
+    scores: [99, 109],
+    // Time the result was entered for publication; the screenshots have no game clock/date.
+    recordedAt: "2026-11-26T15:02:04.000Z"
+  });
 
   function isObject(value) {
     return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -95,11 +103,45 @@
     };
   }
 
+  function samePair(a, b) {
+    return a[0] === b[0] && a[1] === b[1];
+  }
+
+  function openerMatchup(series) {
+    return series.bestOf === 7 && samePair(series.players, OPENER.players) &&
+      samePair(gameTeams(series, 0), OPENER.teams);
+  }
+
+  function openerResult(game) {
+    return game && gameHomeSide(game) === 0 && samePair(game.scores, OPENER.scores);
+  }
+
+  function isPublishedOpener(series, gameIndex) {
+    if (gameIndex !== 0 || series.games[0]?.reportId !== OPENER.reportId) return false;
+    return openerMatchup(series) && openerResult(series.games[0]);
+  }
+
+  function publishedGame() {
+    return {scores: [...OPENER.scores], playedAt: OPENER.recordedAt, homeSide: 0,
+      homeRoll: null, reportId: OPENER.reportId};
+  }
+
+  function publishToFirstSeries(state) {
+    const series = state.active;
+    if (state.history.length || !openerMatchup(series)) return state;
+    const first = series.games[0];
+    if (first ? !openerResult(first) : series.homeRoll !== null) return state;
+    // If this game was already entered, keep its timestamp, dice and all later games.
+    const games = [...series.games];
+    games[0] = first ? {...first, reportId: OPENER.reportId} : publishedGame();
+    return {...state, active: {...series, games}};
+  }
+
   function create(players, bestOf = 7) {
-    const active = players === undefined
-      ? newSeries(["jesse", "Buerchener"], bestOf, {0:["火箭", "湖人"]})
-      : newSeries(players, bestOf);
-    return { version: VERSION, active, history: [] };
+    if (players !== undefined) return {version: VERSION, active: newSeries(players, bestOf), history: []};
+    const active = newSeries(OPENER.players, bestOf, {0:[...OPENER.teams]});
+    if (active.bestOf === 7) active.startedAt = OPENER.recordedAt;
+    return publishToFirstSeries({version: VERSION, active, history: []});
   }
 
   function gameWinner(scores) {
@@ -237,7 +279,9 @@
         throw new Error("备份中的主场归属和掷骰记录不一致。");
       }
       previousHome = side;
-      return { scores, playedAt: timestamp(game.playedAt), homeSide: side, homeRoll: roll };
+      const validated = {scores, playedAt: timestamp(game.playedAt), homeSide: side, homeRoll: roll};
+      if (game.reportId === OPENER.reportId) validated.reportId = OPENER.reportId;
+      return validated;
     });
     if (archived && !wins.includes(target)) throw new Error("历史系列赛缺少决胜场次。");
     if (homeRoll && wins.includes(target)) throw new Error("已结束的系列赛包含多余的待赛掷骰记录。");
@@ -247,7 +291,7 @@
 
   function validateState(value) {
     // Prior formats use the same player order. Missing team selections stay blank.
-    if (!isObject(value) || ![1, 2, VERSION].includes(value.version) || !Array.isArray(value.history)) {
+    if (!isObject(value) || ![1, 2, 3, VERSION].includes(value.version) || !Array.isArray(value.history)) {
       throw new Error("请选择本计分板导出的受支持版本 JSON 备份。");
     }
     const active = validateSeries(value.active, false);
@@ -265,18 +309,21 @@
     return JSON.stringify(validateState(state), null, 2);
   }
 
-  function decode(text) {
+  function decode(text, {publishOpener = false} = {}) {
     let value;
     try {
       value = JSON.parse(text);
     } catch {
       throw new Error("文件内容不是有效的 JSON。");
     }
-    return validateState(value);
+    const state = validateState(value);
+    // Only a local pre-publication scorebook gets this one-time upgrade. Restoring
+    // a backup or undoing, resetting, and reloading a v4 round keeps that choice.
+    return publishOpener && value.version < VERSION ? publishToFirstSeries(state) : state;
   }
 
   globalThis.SeriesEngine = Object.freeze({
-    KEY, create, configure, gameTeams, setGameTeams, rollHome, homeSide, gameHomeSide,
+    KEY, create, configure, gameTeams, setGameTeams, isPublishedOpener, rollHome, homeSide, gameHomeSide,
     record, undo, reset, next, completed, stats, encode, decode
   });
 })();

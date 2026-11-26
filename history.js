@@ -57,6 +57,12 @@
       const row = body.insertRow();
       const heading = element("th", "", "第 " + (index + 1) + " 场");
       heading.scope = "row";
+      if (window.SeriesEngine.isPublishedOpener(series, index)) {
+        const report = element("a", "game-report-link", "技术统计");
+        report.href = "./reports/game-01/index.html";
+        report.setAttribute("aria-label", "查看 G01 火箭对湖人的技术统计");
+        heading.append(report);
+      }
       row.append(heading);
       const home = window.SeriesEngine.gameHomeSide(game);
       const teams = window.SeriesEngine.gameTeams(series,index);

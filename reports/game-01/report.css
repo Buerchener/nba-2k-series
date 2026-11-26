@@ -1,0 +1,79 @@
+.report { background:#111214; }
+.report-header { height:68px; display:flex; align-items:center; justify-content:space-between; }
+.back-link,.report-footer a { color:#d6d8da; text-decoration:none; font-size:14px; }
+.back-link { display:inline-flex; align-items:center; gap:6px; min-height:44px; }
+.back-link span { font:700 25px/1 var(--display); color:var(--orange); }
+.back-link:hover,.report-footer a:hover { color:var(--orange); }
+.game-kicker { margin:35px 0 7px; color:#ceccc9; font-size:14px; font-weight:600; }
+.game-kicker span { color:#6e7075; margin:0 6px; }
+.report h1 { font-size:clamp(30px,4vw,48px); line-height:1.18; letter-spacing:-.045em; }
+.final-score {
+  margin-top:21px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  overflow:hidden; text-align:center; border:1px solid #454248; border-radius:14px;
+  background:radial-gradient(ellipse at 8% 46%,#493032 0,transparent 47%),radial-gradient(ellipse at 92% 44%,#2c3d50 0,transparent 47%),#212225;
+}
+.club { display:grid; justify-items:center; align-content:center; padding:26px 10px; min-width:0; }
+.club-side { color:var(--club); font-size:13px; font-weight:700; }
+.rockets { --club:var(--red); } .lakers { --club:var(--blue); }
+.club strong { margin:2px 0; font-size:clamp(24px,3vw,36px); line-height:1.23; letter-spacing:-.055em; }
+.coach { color:#dededc; font-size:14px; }
+.numerals { display:flex; align-items:center; gap:clamp(10px,2.4vw,35px); font:700 clamp(59px,8vw,109px)/1 var(--display); font-variant-numeric:tabular-nums; }
+.numerals i { color:#929498; font:400 .48em/1 var(--display); }
+.series-line { grid-column:1/-1; padding:8px 12px; background:#1113165c; border-top:1px solid #ffffff18; color:#bbbcc1; font-size:13px; }
+.series-line b { margin-left:8px; color:#e8edf2; font-weight:650; }
+.game-story { max-width:880px; color:#ceced0; font-size:clamp(15px,1.5vw,18px); line-height:1.8; margin:18px 0; }
+.game-story strong { color:#f2f1ed; }
+.section-links { display:flex; gap:clamp(13px,4vw,38px); flex-wrap:wrap; border-block:1px solid var(--line); margin-bottom:24px; }
+.section-links a { display:inline-flex; align-items:center; min-height:45px; font-weight:600; font-size:14px; text-decoration:none; }
+.section-links a:hover { color:var(--orange); }
+.report-section { min-width:0; scroll-margin-top:14px; margin:0 0 25px; }
+.report-section h2 { display:flex; gap:9px; align-items:center; font-size:clamp(20px,2vw,25px); letter-spacing:-.04em; margin-bottom:12px; }
+.report-section h2::before { content:""; width:4px; height:.8em; border-radius:1px; background:var(--orange); transform:skew(-12deg); }
+.team-box,.table-card,.shot-card { background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.team-box + .team-box { margin-top:12px; }
+.team-box summary { display:flex; align-items:center; gap:10px; cursor:pointer; padding:12px 15px; font-weight:700; background:#222427; color:#f5f4f0; list-style:none; }
+.team-box summary::-webkit-details-marker { display:none; }
+.team-box summary::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--club); }
+.team-box summary::after { content:""; width:7px; height:7px; border-bottom:2px solid #a9abaf; border-right:2px solid #a9abaf; transform:rotate(45deg); margin-left:auto; }
+.team-box[open] summary::after { transform:rotate(225deg); }
+.scroll-box { min-width:0; overflow:auto; }
+.scroll-box:focus-visible { outline:2px solid var(--orange); outline-offset:-2px; }
+.report table { border-collapse:collapse; width:100%; font-size:14px; font-variant-numeric:tabular-nums; }
+.box-table { min-width:690px; }
+.report th,.report td { padding:8px 11px; white-space:nowrap; text-align:right; }
+.report thead th { font-size:12px; color:#c1c4c7; background:#24272a; font-weight:650; }
+.report tbody th { color:#ececeb; font-weight:550; }
+.report tr + tr > *, .report tbody tr:first-child > * { border-top:1px solid #ffffff0e; }
+.report table tr > :first-child { text-align:left; }
+.box-table tr > :first-child { position:sticky; left:0; z-index:1; background:#1b1d20; }
+.box-table thead tr > :first-child { background:#24272a; }
+.box-table td:nth-child(3) { font-weight:700; color:var(--club); }
+.report-note { color:#a9aaad; font-size:13px; line-height:1.65; margin:8px 1px 0; }
+.analytics-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; gap:18px; }
+.compare-table thead .red-text { color:var(--red); } .compare-table thead .blue-text { color:var(--blue); }
+.shot-card { margin:0; }
+.shot-image { width:100%; display:block; height:auto; }
+.shot-card figcaption { padding:9px 12px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:5px 12px; font-size:13px; color:#cfccca; }
+.made,.miss { font-size:17px; line-height:1; } .made { color:#ff777a; } .miss { color:#76b6fa; }
+.source-grid { display:grid; gap:9px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.source-grid a { overflow:hidden; border-radius:7px; border:1px solid var(--line); background:#202124; text-decoration:none; }
+.source-grid a:hover { border-color:#9f7857; }
+.source-grid img { width:100%; aspect-ratio:1.7; object-fit:cover; display:block; }
+.source-grid span { display:block; padding:7px; color:#e4dfd8; font-size:12px; font-weight:550; }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.report-footer { padding:18px 0 32px; border-top:1px solid var(--line); }
+@media(max-width:760px) {
+  .analytics-layout { display:block; }
+  .report-header { height:55px; }
+  .game-kicker { margin-top:22px; }
+  .game-story { margin:14px 0; }
+}
+@media(max-width:450px) {
+  .report .wrap { width:calc(100% - 24px); }
+  .numerals { gap:7px; font-size:clamp(46px,14vw,60px); }
+  .club { padding:20px 3px; }
+  .club-side,.coach { font-size:12px; }
+  .source-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .report table { font-size:13px; }
+  .box-table tr > :first-child { max-width:126px; min-width:105px; white-space:normal; overflow-wrap:anywhere; }
+}

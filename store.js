@@ -31,11 +31,11 @@
     lastDiskText = text;
     unsavedChanges = false;
     try {
-      state = freeze(text === null ? engine.create() : engine.decode(text));
+      state = freeze(text === null ? engine.create() : engine.decode(text, {publishOpener:true}));
       mode = "saved";
     } catch {
       // Keep the original bytes available to export until a confirmed import.
-      state = freeze(engine.create());
+      state = freeze(engine.create(["玩家 1", "玩家 2"]));
       mode = "corrupt";
     }
   }

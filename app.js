@@ -60,6 +60,12 @@
         result.dataset.player = winner === 0 ? "red" : "blue";
         result.append(element("i", "win-dot"), element("span", "", series.players[winner] + " 胜"));
         resultCell.append(result);
+        if (engine.isPublishedOpener(series, n)) {
+          const report = element("a", "game-report-link", "技术统计");
+          report.href = "./reports/game-01/index.html";
+          report.setAttribute("aria-label", "查看 G01 火箭对湖人的技术统计");
+          gameCell.append(report);
+        }
       } else {
         scoreCell.append(element("span", "empty-score", "—"));
         const label = ended ? "无需比赛" : next ? "下一场" : n < earliestFinish ? "待开赛" : "如有需要";
@@ -154,7 +160,7 @@
     $("#board-view").hidden = history;
     $("#history-view").hidden = !history;
     $("#settings").hidden = history;
-    document.querySelectorAll(".nav-link").forEach(link => {
+    document.querySelectorAll(".nav-link[data-view]").forEach(link => {
       const active = link.dataset.view === (history ? "history" : "board");
       link.classList.toggle("active", active);
       if (active) link.setAttribute("aria-current", "page");
