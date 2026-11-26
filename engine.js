@@ -3,7 +3,7 @@
   "use strict";
 
   const KEY = "nba2k.series-scorebook.v1";
-  const VERSION = 1;
+  const VERSION = 2;
   const FORMATS = [3, 5, 7];
 
   function isObject(value) {
@@ -52,6 +52,7 @@
       players: playerNames(players),
       bestOf: format(bestOf),
       games: [],
+      homeRoll: null,
       startedAt: new Date().toISOString()
     };
   }
@@ -81,17 +82,52 @@
     return { ...state, active: { ...current, players: playerNames(players), bestOf: value } };
   }
 
+  function rollDie() {
+    const random = globalThis.crypto;
+    if (!random?.getRandomValues) throw new Error("此浏览器无法掷骰，请使用支持随机数生成的浏览器。");
+    const byte = new Uint8Array(1);
+    // Discard four values so each die face has exactly 42 possible bytes.
+    do { random.getRandomValues(byte); } while (byte[0] >= 252);
+    return 1 + byte[0] % 6;
+  }
+
+  function rolledSide(roll) {
+    return !roll || roll.dice[0] === roll.dice[1] ? null : gameWinner(roll.dice);
+  }
+
+  function gameHomeSide(game) {
+    return game?.homeSide ?? 0;
+  }
+
+  function homeSide(series) {
+    return rolledSide(series.homeRoll) ?? gameHomeSide(series.games[series.games.length - 1]);
+  }
+
+  function rollHome(state) {
+    const current = state.active;
+    if (stats(current).champion !== null) throw new Error("本轮已决出冠军。");
+    if (rolledSide(current.homeRoll) !== null) throw new Error("本场的主场已经确定。");
+    const dice = [rollDie(), rollDie()];
+    return { ...state, active: { ...current, homeRoll: { dice } } };
+  }
+
   function record(state, a, b) {
     const current = state.active;
     if (stats(current).champion !== null) throw new Error("本轮已决出冠军。");
-    const game = { scores: scorePair(a, b), playedAt: new Date().toISOString() };
-    return { ...state, active: { ...current, games: [...current.games, game] } };
+    if (current.homeRoll && rolledSide(current.homeRoll) === null) {
+      throw new Error("双方掷出相同点数，请重新掷骰确定主场。");
+    }
+    // Scores and dice use the original player order throughout the series.
+    const game = { scores: scorePair(a, b), playedAt: new Date().toISOString(),
+      homeSide: homeSide(current), homeRoll: current.homeRoll ?? null };
+    return { ...state, active: { ...current, games: [...current.games, game], homeRoll: null } };
   }
 
   function undo(state) {
     const current = state.active;
     if (!current.games.length) throw new Error("本轮还没有可以撤销的比分。");
-    return { ...state, active: { ...current, games: current.games.slice(0, -1) } };
+    const lastGame = current.games[current.games.length - 1];
+    return { ...state, active: { ...current, games: current.games.slice(0, -1), homeRoll: lastGame.homeRoll ?? null } };
   }
 
   function reset(state) {
@@ -119,6 +155,16 @@
     return value;
   }
 
+  function validateRoll(value) {
+    if (value == null) return null;
+    const dice = value.dice;
+    if (!isObject(value) || !Array.isArray(dice) || dice.length !== 2 ||
+        !Array.from(dice).every(n => Number.isInteger(n) && n >= 1 && n <= 6)) {
+      throw new Error("备份中的主场掷骰记录无效。");
+    }
+    return { dice: dice.slice() };
+  }
+
   function validateSeries(value, archived) {
     if (!isObject(value) || typeof value.id !== "string" || !value.id.trim() ||
         !FORMATS.includes(value.bestOf) || !Array.isArray(value.games) ||
@@ -127,8 +173,10 @@
     }
     const players = playerNames(value.players);
     const startedAt = timestamp(value.startedAt);
+    const homeRoll = validateRoll(value.homeRoll);
     const wins = [0, 0];
     const target = (value.bestOf + 1) / 2;
+    let previousHome = 0;
     const games = value.games.map(game => {
       if (wins.includes(target)) throw new Error("备份中包含决出冠军之后的多余场次。");
       if (!isObject(game) || !Array.isArray(game.scores) || game.scores.length !== 2 ||
@@ -137,14 +185,24 @@
       }
       const scores = scorePair(...game.scores);
       wins[gameWinner(scores)] += 1;
-      return { scores, playedAt: timestamp(game.playedAt) };
+      const roll = validateRoll(game.homeRoll);
+      const winner = rolledSide(roll);
+      if (roll && winner === null) throw new Error("已完赛场次仍包含平局掷骰记录。");
+      const side = winner ?? previousHome;
+      if (game.homeSide !== undefined && game.homeSide !== side) {
+        throw new Error("备份中的主场归属和掷骰记录不一致。");
+      }
+      previousHome = side;
+      return { scores, playedAt: timestamp(game.playedAt), homeSide: side, homeRoll: roll };
     });
     if (archived && !wins.includes(target)) throw new Error("历史系列赛缺少决胜场次。");
-    return { id: value.id, players, bestOf: value.bestOf, games, startedAt };
+    if (homeRoll && wins.includes(target)) throw new Error("已结束的系列赛包含多余的待赛掷骰记录。");
+    return { id: value.id, players, bestOf: value.bestOf, games, homeRoll, startedAt };
   }
 
   function validateState(value) {
-    if (!isObject(value) || value.version !== VERSION || !Array.isArray(value.history)) {
+    // Version 1 has the same player order but no per-game home assignments.
+    if (!isObject(value) || ![1, VERSION].includes(value.version) || !Array.isArray(value.history)) {
       throw new Error("请选择本计分板导出的受支持版本 JSON 备份。");
     }
     const active = validateSeries(value.active, false);
@@ -173,6 +231,6 @@
   }
 
   globalThis.SeriesEngine = Object.freeze({
-    KEY, create, configure, record, undo, reset, next, completed, stats, encode, decode
+    KEY, create, configure, rollHome, homeSide, gameHomeSide, record, undo, reset, next, completed, stats, encode, decode
   });
 })();

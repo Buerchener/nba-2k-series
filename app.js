@@ -7,6 +7,7 @@
   const icons = {
     court: '<rect x="2" y="4.5" width="20" height="15" rx="2"/><path d="M12 5v14M2 9h3v6H2m20-6h-3v6h3"/><circle cx="12" cy="12" r="3"/>',
     history: '<path d="M3 5v5h5M3.5 10a8.5 8.5 0 1 1 .5 5"/><path d="M12 7.5v5l3 2"/>',
+    die: '<rect x="3" y="3" width="18" height="18" rx="4"/><g fill="currentColor" stroke="none"><circle cx="7.5" cy="7.5" r="1.5"/><circle cx="16.5" cy="7.5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></g>',
     database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 4 16 4 16 0V5M4 12v6c0 4 16 4 16 0v-6"/>',
     sliders: '<path d="M3 7h5m5 0h8M3 17h9m5 0h4"/><circle cx="10.5" cy="7" r="2.5"/><circle cx="14.5" cy="17" r="2.5"/>',
     pen: '<path d="m4 15 11-11a2.2 2.2 0 0 1 3.2 0l1.8 1.8a2.2 2.2 0 0 1 0 3.2L9 20l-6 1zM13 6l5 5M4 15l5 5"/>',
@@ -46,12 +47,15 @@
       const resultCell = row.insertCell();
       gameCell.append(element("span", "game-num", "G" + pad(n + 1)));
       if (game) {
-        const side = game.scores[0] > game.scores[1] ? 0 : 1;
+        const home = engine.gameHomeSide(game);
+        const away = 1 - home;
+        const homeWin = game.scores[home] > game.scores[away];
+        const winner = homeWin ? home : away;
         const score = element("span", "log-score");
-        score.append(element("span", side === 0 ? "higher-home" : "", game.scores[0]), element("b", "", ":"), element("span", side === 1 ? "higher-away" : "", game.scores[1]));
-        scoreCell.append(score);
-        const result = element("span", "result-name " + (side === 0 ? "home" : "away"));
-        result.append(element("i", "win-dot"), element("span", "", series.players[side] + " 胜"));
+        score.append(element("span", homeWin ? "higher-home" : "", game.scores[home]), element("b", "", ":"), element("span", homeWin ? "" : "higher-away", game.scores[away]));
+        scoreCell.append(score, element("small", "game-home", "主场 · " + series.players[home]));
+        const result = element("span", "result-name " + (homeWin ? "home" : "away"));
+        result.append(element("i", "win-dot"), element("span", "", series.players[winner] + " 胜"));
         resultCell.append(result);
       } else {
         scoreCell.append(element("span", "empty-score", "—"));
@@ -68,6 +72,9 @@
     const { wins, target, champion } = engine.stats(series);
     const ended = champion !== null;
     const count = series.games.length;
+    const home = engine.homeSide(series);
+    const dice = series.homeRoll?.dice;
+    const tied = dice && dice[0] === dice[1];
     const badge = $("#series-status");
     badge.className = "status-pill " + (ended ? "finished" : count ? "playing" : "");
     badge.lastElementChild.textContent = ended ? "已完赛" : count ? "进行中" : "待开赛";
@@ -76,7 +83,15 @@
     $("#hero-rule").textContent = "先赢 " + target + " 场夺冠";
     $("#progress-count").textContent = "已赛 " + count + " / " + series.bestOf + " 场";
     $("#log-total").textContent = "最多 " + series.bestOf + " 场";
-    ["home", "away"].forEach((key, i) => {
+    $("#home-dice").hidden = ended;
+    $("#home-dice-label").textContent = tied ? "平局，重新掷骰" : dice ? "查看掷骰结果" : "掷骰定主场";
+    $("#home-dice").title = "第 " + (count + 1) + " 场 · " + $("#home-dice-label").textContent;
+    $("#record-label").textContent = tied ? "重新掷骰后可记分" : "记录本场比分";
+    $("#score-form .record-btn").disabled = submitting || Boolean(tied);
+    [home, 1 - home].forEach((i, position) => {
+      const key = position === 0 ? "home" : "away";
+      $("#" + key + "-role-en").textContent = tied ? "P" + (i + 1) : key.toUpperCase();
+      $("#" + key + "-role").textContent = tied ? "待定" : position === 0 ? "主场" : "客场";
       $("#name-" + key).textContent = series.players[i];
       $("#input-" + key + "-label").textContent = series.players[i];
       const win = $("#wins-" + key);
@@ -151,8 +166,10 @@
     submitting = true;
     form.querySelector("button").disabled = true;
     try {
-      const [a, b] = inputs.map(input => input.value.trim());
-      const result = await store.update(state => engine.record(state, a, b), scoreDraft || store.get());
+      const expected = scoreDraft || store.get();
+      const home = engine.homeSide(expected.active);
+      const scores = inputs.map(input => input.value.trim());
+      const result = await store.update(state => engine.record(state, scores[home], scores[1 - home]), expected);
       const winner = engine.stats(result.active).champion;
       toast(winner === null ? "已记录第 " + result.active.games.length + " 场比分" : result.active.players[winner] + " 赢得冠军奖杯！");
       if (winner !== null) $("#winner-card button").focus({ preventScroll:true });
@@ -164,8 +181,26 @@
       first.focus();
     } finally {
       submitting = false;
-      form.querySelector("button").disabled = false;
+      const dice = store.get().active.homeRoll?.dice;
+      form.querySelector("button").disabled = Boolean(dice && dice[0] === dice[1]);
     }
+  });
+  $("#home-dice").addEventListener("click", () => {
+    window.HomeDice.open({
+      getState:store.get,
+      async update(transform, expected) {
+        // Preserve unsubmitted scores against their players if the draw swaps sides.
+        const before = engine.homeSide(expected.active);
+        const draftValues = inputs.map(input => input.value);
+        const result = await store.update(transform, expected);
+        if (store.get() === result && draftValues.some(Boolean)) {
+          if (engine.homeSide(result.active) !== before) draftValues.reverse();
+          inputs.forEach((input, i) => { input.value = draftValues[i]; });
+          scoreDraft = result;
+        }
+        return result;
+      }
+    });
   });
   document.addEventListener("click", event => {
     const control = event.target.closest("[data-open]");

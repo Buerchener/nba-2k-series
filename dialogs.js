@@ -141,10 +141,11 @@
       const options = [3, 5, 7].map((n, i) =>
         '<label class="cs-d-option"><input type="radio" name="format" value="' + n + '">' +
         '<span><b>BO' + n + '</b><small>' + labels[i] + '</small></span></label>').join("");
+      const home = nextRound ? 0 : engine.homeSide(series);
       const names = [0, 1].map(i =>
-        '<label class="cs-d-player"><span><i class="cs-d-dot p' + (i + 1) + '"></i>玩家 ' + (i + 1) + ' 昵称</span>' +
+        '<label class="cs-d-player"><span><i class="cs-d-dot p' + (i === home ? 1 : 2) + '"></i>玩家 ' + (i + 1) + ' 昵称</span>' +
         '<input type="text" name="player' + i + '" autocomplete="off" required></label>').join("");
-      const resetLink = !nextRound && series.games.length
+      const resetLink = !nextRound && (series.games.length || series.homeRoll)
         ? '<div class="cs-d-reset-row"><button type="button" class="cs-d-text-btn cs-d-reset">' +
           icon("reset", 16) + '重置本轮比分</button></div>' : "";
       frame(nextRound ? "next" : "settings",
@@ -191,7 +192,7 @@
       const title = undoing ? "撤销上一场？" : "重置本轮比分？";
       const description = undoing
         ? (champion !== null ? "撤销决胜场后，本轮将重新开放记分。" : "撤销后，可以重新录入这场比赛的正确比分。")
-        : "将清空本轮所有比分和冠军结果。昵称、赛制及往期已归档的系列赛会保留。";
+        : "将清空本轮的比分、主场掷骰和冠军结果。昵称、赛制及往期已归档的系列赛会保留。";
       frame(undoing ? "undo" : "reset", title, description,
         '<div class="cs-d-summary"><span></span><strong></strong></div>',
         cancelButton(back ? "返回设置" : "取消") + primaryButton(undoing ? "撤销上一场" : "确认重置", true));
@@ -199,6 +200,9 @@
       $(".cs-d-summary strong").textContent = undoing && last ?
         series.players[0] + " " + last.scores[0] + " ∶ " + last.scores[1] + " " + series.players[1] :
         series.games.length + " 场比赛";
+      if (undoing && series.homeRoll) {
+        $(".cs-d-description").textContent += " 本场待用的掷骰会清除，并恢复上一场的主客场。";
+      }
       if (back) {
         const cancel = $(".cs-d-cancel");
         cancel.removeEventListener("click", close);

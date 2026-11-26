@@ -185,6 +185,12 @@
 .archive-game-win {
   font-weight: 700;
 }
+.archive-game-role {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
 .archive-game-win.side-0 {
   color: var(--orange, #ff783c);
 }
