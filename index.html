@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111214">
+  <meta name="description" content="和朋友打一轮 NBA 2K 系列赛。逐场记分，追踪胜场，争夺冠军奖杯。">
+  <title>Courtside · NBA 2K 系列赛记分台</title>
+  <link rel="icon" href="./assets/courtside.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./dialogs.css">
+  <link rel="stylesheet" href="./history.css">
+  <script defer src="./engine.js"></script>
+  <script defer src="./store.js"></script>
+  <script defer src="./dialogs.js"></script>
+  <script defer src="./history.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳转到主要内容</a>
+  <header class="site-header">
+    <div class="header-inner wrap">
+      <a class="brand" href="#board" aria-label="Courtside 记分台">
+        <img src="./assets/courtside.svg" alt="" width="38" height="38">
+        <span>COURTSIDE</span>
+      </a>
+      <nav aria-label="主要导航">
+        <a class="nav-link active" data-view="board" href="#board" aria-current="page"><span data-icon="court"></span>记分台</a>
+        <a class="nav-link" data-view="history" href="#history"><span data-icon="history"></span>系列赛历史</a>
+      </nav>
+      <button class="header-data" type="button" data-open="data"><span data-icon="database"></span>数据管理</button>
+    </div>
+  </header>
+
+  <main class="wrap" id="main" tabindex="-1">
+    <div class="titlebar">
+      <div><h1 id="page-title">系列赛记分台</h1><p id="page-caption">NBA 2K 双人对决</p></div>
+      <button class="secondary-btn" id="settings" type="button" data-open="settings"><span data-icon="sliders"></span>系列赛设置</button>
+    </div>
+    <div id="storage-warning" class="storage-warning" hidden></div>
+
+    <div id="board-view">
+      <section class="scoreboard" aria-labelledby="matchup-title">
+        <div class="arena">
+          <div class="arena-pattern" aria-hidden="true"></div>
+          <svg class="court-lines" viewBox="0 0 1000 280" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+            <g fill="none" stroke="currentColor" stroke-width="1.2">
+              <path d="M65 -42H935V322H65Z M500 -42V322"/>
+              <circle cx="500" cy="140" r="74"/>
+              <path d="M66 18H100C245 18 245 262 100 262H66 M934 18H900C755 18 755 262 900 262H934 M65 91H159V189H65 M935 91H841V189H935"/>
+              <circle cx="159" cy="140" r="48"/><circle cx="841" cy="140" r="48"/>
+            </g>
+          </svg>
+          <div class="hero-top">
+            <h2 id="matchup-title"><i></i>系列赛大比分</h2>
+            <span class="status-pill" id="series-status"><i></i><span>待开赛</span></span>
+          </div>
+          <div class="matchup">
+            <div class="competitor home">
+              <span class="side-tag"><i></i>HOME <b>/</b> 主场</span>
+              <h3 id="name-home">玩家 1</h3>
+              <div class="win-count" id="wins-home" aria-label="主场 0 胜">0</div>
+              <div class="win-marks" id="marks-home" aria-hidden="true"></div>
+            </div>
+            <div class="trophy-block">
+              <div class="trophy-halo">
+                <img id="trophy" src="./assets/trophy.png" alt="金色篮球冠军奖杯" width="238" height="512">
+              </div>
+              <div class="trophy-plaque"><i></i><span id="trophy-label">冠军奖杯</span><i></i></div>
+            </div>
+            <div class="competitor away">
+              <span class="side-tag"><i></i>AWAY <b>/</b> 客场</span>
+              <h3 id="name-away">玩家 2</h3>
+              <div class="win-count" id="wins-away" aria-label="客场 0 胜">0</div>
+              <div class="win-marks" id="marks-away" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-foot">
+          <div><span class="format" id="hero-bo">BO7</span><span id="hero-rule">先赢 4 场夺冠</span></div>
+          <span class="progress-count" id="progress-count">已赛 0 / 7 场</span>
+        </div>
+      </section>
+
+      <div class="score-panels">
+        <section class="panel entry-panel" aria-labelledby="entry-heading">
+          <div class="panel-heading"><div class="panel-heading-label"><span class="icon-box orange-icon" data-icon="pen"></span><h2 id="entry-heading">录入比分</h2></div><span class="game-label" id="game-label">GAME 01</span></div>
+          <form id="score-form" novalidate>
+            <div class="score-inputs">
+              <label class="input-side home"><span class="input-name"><i></i><span id="input-home-label">玩家 1</span></span><input id="score-home" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="0" required></label>
+              <span class="input-colon" aria-hidden="true">:</span>
+              <label class="input-side away"><span class="input-name"><i></i><span id="input-away-label">玩家 2</span></span><input id="score-away" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="0" required></label>
+            </div>
+            <p id="score-error" class="form-error" role="alert" hidden></p>
+            <button class="record-btn" type="submit"><span data-icon="plus-circle"></span>记录本场比分</button>
+          </form>
+          <div class="winner-card" id="winner-card" hidden>
+            <span class="winner-icon" data-icon="trophy"></span>
+            <strong id="winner-name"></strong><p id="winner-text"></p>
+            <button class="record-btn" type="button" data-open="next"><span data-icon="plus-circle"></span>开始下一轮</button>
+          </div>
+          <div class="entry-foot"><button id="undo" class="text-button" type="button" data-open="undo" disabled><span data-icon="undo"></span>撤销上一场</button></div>
+        </section>
+        <section class="panel log-panel" aria-labelledby="log-heading">
+          <div class="panel-heading"><div class="panel-heading-label"><span class="icon-box" data-icon="list"></span><h2 id="log-heading">逐场战绩</h2></div><span class="quiet-meta" id="log-total">共 7 场</span></div>
+          <div class="table-scroll"><table class="log-table"><thead><tr><th scope="col">场次</th><th scope="col">比分 <span class="order-hint">主 / 客</span></th><th scope="col">结果</th></tr></thead><tbody id="game-list"></tbody></table></div>
+        </section>
+      </div>
+    </div>
+    <section id="history-view" aria-label="历史系列赛" hidden></section>
+  </main>
+  <footer class="wrap site-footer">
+    <span class="save-state" id="save-state"><span data-icon="drive"></span><span id="save-text">保存在此浏览器</span></span>
+    <span class="footer-wordmark">COURTSIDE <i>/</i> NBA 2K</span>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript>请启用 JavaScript 以使用系列赛记分台。</noscript>
+</body>
+</html>

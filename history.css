@@ -1,0 +1,230 @@
+.archive-list {
+  display: grid;
+  gap: 14px;
+}
+.archive-entry,
+.archive-empty {
+  color: #f5f4f1;
+  background: var(--panel, #1b1d20);
+  border: 1px solid var(--line, #34373a);
+  border-radius: 16px;
+}
+.archive-empty {
+  display: grid;
+  justify-items: center;
+  padding: clamp(38px, 7vw, 78px) 22px;
+  text-align: center;
+}
+.archive-empty-emblem,
+.archive-mark {
+  display: grid;
+  place-items: center;
+  color: var(--orange, #ff783c);
+  background: #30251f;
+  border: 1px solid #56372a;
+}
+.archive-empty-emblem {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  transform: rotate(-6deg);
+}
+.archive-empty-emblem svg {
+  width: 36px;
+  transform: rotate(6deg);
+}
+.archive-empty h2 {
+  margin: 22px 0 8px;
+  font-size: clamp(19px, 2.3vw, 25px);
+}
+.archive-empty p {
+  margin: 0;
+  color: var(--muted, #a7a9ad);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.archive-return {
+  appearance: none;
+  margin: 25px 0 0;
+  padding: 10px 20px;
+  min-height: 44px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #22150e;
+  background: var(--orange, #ff783c);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.archive-return:hover {
+  background: #ff925d;
+}
+.archive-summary {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) minmax(100px, 25%) 12px;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  list-style: none;
+  cursor: pointer;
+}
+.archive-summary::-webkit-details-marker {
+  display: none;
+}
+.archive-summary:focus-visible,
+.archive-return:focus-visible {
+  outline: 2px solid var(--orange, #ff783c);
+  outline-offset: 3px;
+}
+.archive-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+}
+.archive-mark svg {
+  width: 24px;
+}
+.archive-description,
+.archive-tally {
+  display: grid;
+  min-width: 0;
+}
+.archive-description {
+  gap: 5px;
+}
+.archive-meta,
+.archive-opponent {
+  color: var(--muted, #a7a9ad);
+  font-size: 12px;
+}
+.archive-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 12px;
+  font-variant-numeric: tabular-nums;
+}
+.archive-series-num {
+  font-weight: 650;
+  color: #e1ddd8;
+}
+.archive-champion {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.archive-winner-name {
+  font-size: 19px;
+  font-weight: 720;
+  overflow-wrap: anywhere;
+}
+.archive-winner-label {
+  color: var(--orange, #ff783c);
+  font-size: 11px;
+  font-weight: 700;
+}
+.archive-tally {
+  justify-items: end;
+  gap: 2px;
+  text-align: right;
+}
+.archive-scoreline {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.archive-scoreline strong {
+  color: var(--orange, #ff783c);
+}
+.archive-opponent {
+  overflow-wrap: anywhere;
+}
+.archive-chevron {
+  width: 8px;
+  height: 8px;
+  align-self: center;
+  border: solid var(--muted, #a7a9ad);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+.archive-entry[open] .archive-chevron {
+  transform: rotate(-135deg);
+}
+.archive-games {
+  table-layout: fixed;
+  width: calc(100% - 48px);
+  margin: 0 24px 14px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.archive-games th,
+.archive-games td {
+  padding: 10px 6px;
+  border-top: 1px solid var(--line, #34373a);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.archive-games th:first-child {
+  width: 25%;
+  text-align: left;
+}
+.archive-games th {
+  color: var(--muted, #a7a9ad);
+  font-size: 12px;
+  font-weight: 500;
+}
+.archive-games td {
+  font-size: 14px;
+}
+.archive-game-win {
+  font-weight: 700;
+}
+.archive-game-win.side-0 {
+  color: var(--orange, #ff783c);
+}
+.archive-game-win.side-1 {
+  color: var(--blue, #80b2ea);
+}
+.archive-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .archive-summary {
+    grid-template-columns: minmax(0, 1fr) minmax(58px, 25%) 9px;
+    gap: 12px;
+    padding: 16px;
+  }
+  .archive-mark {
+    display: none;
+  }
+  .archive-meta {
+    gap: 2px 8px;
+    font-size: 11px;
+  }
+  .archive-meta time {
+    width: 100%;
+  }
+  .archive-winner-name {
+    font-size: 17px;
+  }
+  .archive-scoreline {
+    font-size: 20px;
+  }
+  .archive-games {
+    width: calc(100% - 32px);
+    margin-inline: 16px;
+  }
+}

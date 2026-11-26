@@ -1,0 +1,42 @@
+# COURTSIDE · NBA 2K 系列赛记分板
+
+[打开记分台](https://buerchener.github.io/nba-2k-series/)
+
+用手机或电脑记下每场 NBA 2K 的最终比分，看看谁能拿下这轮系列赛的冠军奖杯。
+
+## 怎么打
+
+1. 在系列赛设置里填好双方昵称，选定赛制。默认 **BO7（七场四胜）**。时间有限可以选 BO3（三场两胜）或 BO5（五场三胜）。
+2. 每打完一场，按双方昵称的顺序填入最终得分，提交比分。若常规时间打平，先打加时，分出胜负后再记分。
+3. 每赢一场得一个系列赛胜场。当一方达到目标胜场，系列赛提前结束，页面会展示冠军和奖杯。
+
+首场比分录入后，本轮赛制随即锁定。昵称仍可修改，改动会应用到本轮全部记录。
+
+## 记错了怎么办
+
+- **撤销上一场**会移除本轮最近一场比分，可以连续撤销。如果撤销的是决胜局，冠军随之撤回，可以继续本轮比赛。
+- **重置本轮**会清空当前系列赛的全部比分，保留昵称、赛制和以往已归档的系列赛。
+- 夺冠后就能在系列赛历史里看到这一轮。选择开始下一轮才会正式归档，并开启一轮空白系列赛。需要纠正决胜局时，请在开始下一轮前撤销。
+
+## 存档和换设备
+
+比分和历史通过 `localStorage` 保存在当前浏览器。你和朋友即使打开同一个网址，也各自使用各自的存档。清除网站数据会一并清除记分记录。
+
+换手机或交给朋友接着记时，先在原设备导出 JSON 文件，再在新设备导入。导入会替换目标浏览器里的整份存档。如果两边都有想保留的记录，请先各自导出一份备份。
+
+## 本地打开
+
+下载并解压网页文件后，双击 `index.html` 即可打开。也可以在 `index.html` 所在目录运行以下命令，再访问 [本地记分板](http://localhost:8000/)。
+
+```sh
+python3 -m http.server 8000
+```
+
+## 部署到 GitHub Pages
+
+1. 在 GitHub 建一个公开仓库，把网页文件连同资源文件夹放在 `main` 分支根目录，确保打开仓库就能看到 `index.html`。
+2. 打开仓库的 **Settings → Pages**。在 **Build and deployment** 下选择 **Deploy from a branch**。
+3. 选择 **main** 和 **/(root)**，点击 **Save**。
+4. 等待发布完成，再从 **Settings → Pages → Visit site** 打开。对于 `Buerchener/nba-2k-series`，站点地址为 `https://buerchener.github.io/nba-2k-series/`。以后把修改提交到同一分支，就会自动更新。
+
+更多发布选项见 [GitHub Pages 官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)。
